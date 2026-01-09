@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>キャパ可視化UI モック</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #fafafa;
+      padding: 16px;
+    }
+
+    .task {
+      margin-bottom: 24px;
+    }
+
+    .task-title {
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .bar {
+      position: relative;
+      height: 56px;
+      background: #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .complete-zone {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 120px;
+      background: #d1fae5;
+      border-right: 2px dashed #10b981;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #065f46;
+      pointer-events: none;
+    }
+
+    .line {
+      position: absolute;
+      left: 120px;
+      right: 0;
+      top: 50%;
+      height: 2px;
+      background: #9ca3af;
+      transform: translateY(-50%);
+    }
+
+    .note {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 6px 10px;
+      border-radius: 6px;
+      color: #111827;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: grab;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .note:active {
+      cursor: grabbing;
+    }
+
+    .tanaka { background: #fde68a; }
+    .sato   { background: #bfdbfe; }
+    .suzuki { background: #fca5a5; }
+  </style>
+</head>
+<body>
+
+  <div class="task">
+    <div class="task-title">タスク：資料作成</div>
+    <div class="bar">
+      <div class="complete-zone">完了</div>
+      <div class="line"></div>
+      <div class="note tanaka" style="left: 140px;">田中</div>
+      <div class="note sato" style="left: 260px;">佐藤</div>
+    </div>
+  </div>
+
+  <div class="task">
+    <div class="task-title">タスク：実装</div>
+    <div class="bar">
+      <div class="complete-zone">完了</div>
+      <div class="line"></div>
+      <div class="note suzuki" style="left: 180px;">鈴木</div>
+    </div>
+  </div>
+
+<script>
+  const notes = document.querySelectorAll('.note');
+
+  notes.forEach(note => {
+    let offsetX = 0;
+
+    note.addEventListener('mousedown', e => {
+      offsetX = e.offsetX;
+
+      const onMouseMove = eMove => {
+        const bar = note.parentElement;
+        const rect = bar.getBoundingClientRect();
+        let x = eMove.clientX - rect.left - offsetX;
+
+        // 横方向制限
+        x = Math.max(0, Math.min(x, rect.width - note.offsetWidth));
+        note.style.left = x + 'px';
+      };
+
+      const onMouseUp = () => {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+      };
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    });
+  });
+</script>
+
+</body>
+</html>
